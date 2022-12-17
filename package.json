@@ -1,0 +1,27 @@
+{
+  "name": "check-my-secrets",
+  "version": "1.0.0",
+  "description": "Utility function checking whether secrets are compromised",
+  "main": "app.js",
+  "engines": {
+    "node": ">=15"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node --no-warnings index",
+    "lint": "eslint core/*.*js *.*js"
+  },
+  "keywords": [
+    ""
+  ],
+  "author": "koalyptus",
+  "license": "MIT",
+  "dependencies": {
+    "ckey": "^1.0.2",
+    "keyring": "^1.1.0",
+    "node-fetch": "^3.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.5.1"
+  }
+}
