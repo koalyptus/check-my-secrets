@@ -1,16 +1,17 @@
 import ck from 'ckey';
 import keyring from 'keyring';
+import notifier from 'node-notifier';
 import { checkPasswords } from './core/check-passwords.mjs';
 
 async function main() {
-    const encryptionKey = ck.ENCRYPTION_KEY || 'hello-world=123';
-    const passwordsKey = ck.PWDS_KEY || 'check_my_pwds';
+    const encryptionKey = ck.ENCRYPTION_KEY || 'hello-world-123';
+    const passwordsKey = ck.PWDS_KEY || 'checkmysecrets.pwds';
     // making the assumption commas are generally not allowed in passwords,
     // change the separator sequence if that not the case for you
     const passwordsSeparator = ck.PWDS_SEPARATOR || ',';
 
-    const keyringApi = keyring.instance(encryptionKey).load();
-    const passwords = keyringApi.retrieve(passwordsKey);
+    const keyringDb = keyring.instance(encryptionKey).load();
+    const passwords = keyringDb.retrieveEncrypted(passwordsKey);
 
     if (passwords === null) {
         console.warn(
@@ -30,7 +31,14 @@ async function main() {
         return
     }
 
-    await checkPasswords(passwords.split(passwordsSeparator));
+    const { compromised, message } = await checkPasswords(passwords.split(passwordsSeparator));
+
+    notifier.notify({
+        appID: 'Check My Secrets',
+        title: 'Scan result',
+        icon: compromised ? 'assets/Error.png' : 'assets/CompleteCheckmark.png',
+        message
+    });
 }
 
 main();
