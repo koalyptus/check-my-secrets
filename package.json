@@ -2,14 +2,14 @@
   "name": "check-my-secrets",
   "version": "0.0.1",
   "description": "NodeJS script checking whether any of my secrets are compromised.",
-  "main": "index.js",
+  "bin": "./bin/check-my-secrets.js",
   "engines": {
     "node": ">=17"
   },
   "type": "module",
   "scripts": {
-    "start": "node --no-warnings index",
-    "lint": "eslint core/*.*js *.*js"
+    "start": "node --no-warnings bin/check-my-secrets.js",
+    "lint": "eslint lib/*.*js bin/*.*js"
   },
   "keywords": [
     "security",

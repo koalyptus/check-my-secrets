@@ -1,7 +1,9 @@
+#!/usr/bin/env node
+
 import ck from 'ckey';
 import keyring from 'keyring';
 import notifier from 'node-notifier';
-import { checkPasswords } from './core/check-passwords.mjs';
+import { checkPasswords } from '../lib/check-passwords.mjs';
 
 async function main() {
     const encryptionKey = ck.ENCRYPTION_KEY || 'hello-world-123';
