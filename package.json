@@ -1,10 +1,10 @@
 {
   "name": "check-my-secrets",
-  "version": "1.0.0",
-  "description": "Utility function checking whether secrets are compromised",
+  "version": "0.0.1",
+  "description": "NodeJS script checking whether any of my secrets are compromised.",
   "main": "index.js",
   "engines": {
-    "node": ">=15"
+    "node": ">=17"
   },
   "type": "module",
   "scripts": {
@@ -12,7 +12,10 @@
     "lint": "eslint core/*.*js *.*js"
   },
   "keywords": [
-    "secrets"
+    "security",
+    "secrets",
+    "secret-management",
+    "password-integrity"
   ],
   "author": "koalyptus",
   "license": "MIT",
