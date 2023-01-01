@@ -1,7 +1,7 @@
 {
   "name": "check-my-secrets",
   "version": "0.0.1",
-  "description": "NodeJS script checking whether any of my secrets are compromised.",
+  "description": "NodeJS script checking whether any of the passwords used online are compromised.",
   "bin": "./bin/check-my-secrets.js",
   "engines": {
     "node": ">=17"
@@ -17,7 +17,10 @@
     "secret-management",
     "password-integrity"
   ],
-  "author": "koalyptus",
+  "author": {
+    "name": "Max Guglielmi",
+    "url": "https://github.com/koalyptus"
+  },
   "license": "MIT",
   "dependencies": {
     "ckey": "^1.0.2",

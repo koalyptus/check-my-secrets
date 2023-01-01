@@ -1,6 +1,6 @@
-# Check-my-secrets
+# Check My Secrets
 
-> NodeJS script checking whether any of my passwords used online are compromised.
+> NodeJS script checking whether any of the passwords used online are compromised.
 
 It uses the `';--have i been pwned?` V3 API, specifically the `GET` `https://api.pwnedpasswords.com/range/{first 5 hash chars}` to determine if a password is compromised.
 
