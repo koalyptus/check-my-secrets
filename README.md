@@ -50,7 +50,7 @@ To list the passwords use the following command:
 ```bash
 keyring retrieve -k 'checkmysecrets.{PWDS_KEY HERE}' -d -p '{ENCRYPTION_KEY HERE}'
 ```
-5. Finally use `npm start` command to check the integrity of your passwords, alternatively `node index`. Depending on the OS a notification similar to below should pop-out:
+5. Finally use `npm start` command to check the integrity of your passwords, alternatively `node bin/check-my-secrets`. Depending on the OS a notification similar to below should pop-out:
 
 ![Check My Secrets notification](assets/success-screenshot.png)
 

@@ -4,6 +4,8 @@ import ck from 'ckey';
 import keyring from 'keyring';
 import notifier from 'node-notifier';
 import { checkPasswords } from '../lib/check-passwords.mjs';
+import { logger } from '../lib/logger.mjs';
+import { ERR_OSSL_BAD_DECRYPT, README_STORE_SECRETS } from '../lib/constants.mjs';
 
 async function main() {
     const encryptionKey = ck.ENCRYPTION_KEY || 'hello-world-123';
@@ -11,25 +13,50 @@ async function main() {
     // making the assumption commas are generally not allowed in passwords,
     // change the separator sequence if that not the case for you
     const passwordsSeparator = ck.PWDS_SEPARATOR || ',';
+    let passwords;
 
-    const keyringDb = keyring.instance(encryptionKey).load();
-    const passwords = keyringDb.retrieveEncrypted(passwordsKey);
+    try {
+        const keyringDb = keyring.instance(encryptionKey).load();
+        passwords = keyringDb.retrieveEncrypted(passwordsKey);
+    } catch (ex) {
+        if (ex.code === ERR_OSSL_BAD_DECRYPT) {
+            logger.log({
+                level: 'warn',
+                message: 'Unable to decrypt secrets with provided encryption key. ' + README_STORE_SECRETS
+            });
+
+            return
+        }
+
+        logger.log({ level: 'error', message: ex });
+
+        return
+    }
 
     if (passwords === null) {
-        console.warn(
-            `'${passwordsKey}' key is not defined in keyring.`,
-            'Refer to the README to see how to store secrets with keyring command line.'
-        );
+        logger.log({
+            level: 'warn',
+            message: 'Provided key is not defined in keyring. ' + README_STORE_SECRETS
+        });
+
         return
     }
 
     if (typeof passwords !== 'string') {
-        console.warn(`'${passwordsKey}' key should only contain a string.`);
+        logger.log({
+            level: 'warn',
+            message: 'Provided value should only contain a string.'
+        });
+
         return
     }
 
     if (!passwords) {
-        console.warn(`Could not find any value for '${passwordsKey}' key.`);
+        logger.log({
+            level: 'warn',
+            message: 'Could not find any value for provided key.'
+        });
+
         return
     }
 
@@ -39,6 +66,11 @@ async function main() {
         appID: 'Check My Secrets',
         title: 'Scan result',
         icon: compromised ? 'assets/Error.png' : 'assets/CompleteCheckmark.png',
+        message
+    });
+
+    logger.log({
+        level: compromised ? 'warn' : 'info',
         message
     });
 }
