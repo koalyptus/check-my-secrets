@@ -60,7 +60,8 @@ async function main() {
         return
     }
 
-    const { compromised, message } = await checkPasswords(passwords.split(passwordsSeparator));
+    const uniquePasswords = [...new Set(passwords.split(passwordsSeparator))];
+    const { compromised, message } = await checkPasswords(uniquePasswords);
 
     notifier.notify({
         appID: 'Check My Secrets',
