@@ -9,7 +9,7 @@ It uses the `';--have i been pwned?` V3 API, specifically the `GET` `https://api
 
 ## Getting started
 
-1. Clone the repo :point_up: with functionality of your choice, for example:
+1. Clone the repo :point_up:, for example:
 ```bash
 git clone https://github.com/koalyptus/check-my-secrets.git
 ```
