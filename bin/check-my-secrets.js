@@ -63,15 +63,15 @@ async function main() {
     const uniquePasswords = [...new Set(passwords.split(passwordsSeparator))];
     const { compromised, message } = await checkPasswords(uniquePasswords);
 
+    logger.log({
+        level: compromised ? 'warn' : 'info',
+        message
+    });
+
     notifier.notify({
         appID: 'Check My Secrets',
         title: 'Scan result',
         icon: compromised ? 'assets/Error.png' : 'assets/CompleteCheckmark.png',
-        message
-    });
-
-    logger.log({
-        level: compromised ? 'warn' : 'info',
         message
     });
 }
