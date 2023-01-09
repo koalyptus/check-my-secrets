@@ -9,13 +9,17 @@
   "type": "module",
   "scripts": {
     "start": "node --no-warnings bin/check-my-secrets.js",
+    "format": "npx prettier --check lib/*.*js bin/*.*js --loglevel debug",
     "lint": "eslint lib/*.*js bin/*.*js"
   },
   "keywords": [
     "security",
     "secrets",
     "secret-management",
-    "password-integrity"
+    "password-integrity",
+    "password-safety",
+    "haveibeenpwned",
+    "security-tools"
   ],
   "author": {
     "name": "Max Guglielmi",
@@ -30,6 +34,7 @@
     "winston": "^3.8.2"
   },
   "devDependencies": {
-    "eslint": "^6.5.1"
+    "eslint": "^8.31.0",
+    "prettier": "^2.8.2"
   }
 }
