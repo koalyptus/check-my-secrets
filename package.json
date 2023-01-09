@@ -9,7 +9,8 @@
   "type": "module",
   "scripts": {
     "start": "node --no-warnings bin/check-my-secrets.js",
-    "format": "npx prettier --check lib/*.*js bin/*.*js --loglevel debug",
+    "format": "npx prettier --check lib/*.*js bin/*.*js",
+    "format:fix": "npm run format -- --write",
     "lint": "eslint lib/*.*js bin/*.*js"
   },
   "keywords": [
