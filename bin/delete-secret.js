@@ -8,10 +8,10 @@ import { logger } from '../lib/logger.mjs';
 
 function main() {
   const argv = yargs(hideBin(process.argv)).argv;
-  const newPassword = argv._[0];
+  const passwordToDelete = argv._[0];
 
-  if (!newPassword) {
-    logger.log({ level: 'error', message: 'Please provide a password to add.' });
+  if (!passwordToDelete) {
+    logger.log({ level: 'error', message: 'Please provide a password to delete.' });
     return;
   }
 
@@ -27,22 +27,18 @@ function main() {
       passwordList = passwords.split(passwordsSeparator);
     }
 
-    if (passwordList.includes(newPassword)) {
-      logger.log({ level: 'warn', message: 'Password already exists.' });
+    const initialLength = passwordList.length;
+    passwordList = passwordList.filter(p => p !== passwordToDelete);
 
-      return;
+    if (passwordList.length === initialLength) {
+      logger.log({ level: 'warn', message: `Password not found.` });
+    } else {
+      passwords = passwordList.join(passwordsSeparator);
+      entry.setPassword(passwords);
+      logger.log({ level: 'info', message: 'Password successfully deleted.' });
     }
-
-    passwordList.push(newPassword);
-    passwords = passwordList.join(passwordsSeparator);
-
-    entry.setPassword(passwords);
-    logger.log({ level: 'info', message: 'Password successfully added.' });
-
   } catch (error) {
-    logger.log({ level: 'error', message: `Error adding password: ${error}` });
-
-    return;
+    logger.log({ level: 'error', message: `Error deleting password: ${error}` });
   }
 }
 

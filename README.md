@@ -23,34 +23,48 @@ npm install
 ```bash
 # Replace the curly brackets too!
 
-# Encryption key used by Keyring
-ENCRYPTION_KEY={your-encryption-key-here}
+# Key used by Keyring to store the comma (or symbol of your choice) separated passwords
+PWDS_KEY=checkmysecrets.{your-key-for-passwords}
 
 # Symbol used to separate passwords, defaults to `,`
 PWDS_SEPARATOR={separator_here}
-
-# Key used by Keyring to store the comma (or symbol of your choice) separated passwords
-PWDS_KEY=checkmysecrets.{your-key-for-passwords}
 ```
 :warning: If env file is not present the script will default to following values in same order of appearance in `.env` file:
 ```bash
-hello-world-123
-,
 checkmysecrets.pwds
+,
 ```
-Please note that failing to provide a `.env` poses obvious security risks as the encryption key is publicly disclosed here.
+Please note that failing to provide a `.env` poses obvious security risks as the key is publicly disclosed here.
 
-4. In command line use following command to set the comma (or any symbol of your choice) separated passwords in Keyring:
-```bash
-keyring store -k checkmysecrets.{PWDS_KEY HERE} -v 'my-password,another-password' -e -p {ENCRYPTION_KEY HERE}
-```
-:warning: the command even when executed successfully outputs some warnings related to deprecated dependencies. Disregard these for the time being.
+4. Manage your passwords using the following commands:
 
-To list the passwords use the following command:
-```bash
-keyring retrieve -k 'checkmysecrets.{PWDS_KEY HERE}' -d -p '{ENCRYPTION_KEY HERE}'
-```
-5. Finally use `npm start` command to check the integrity of your passwords, alternatively `node bin/check-my-secrets`. Depending on the OS a notification similar to below should pop-out:
+   - **Add a password:**
+     ```bash
+     npm run secrets:add <your-password>
+     ```
+     This will add `<your-password>` to your keyring. If the password already exists, it will not be added again.
+
+   - **List all stored passwords:**
+     ```bash
+     npm run secrets:list
+     ```
+     This will display a table of your stored passwords after an interactive confirmation.
+
+   - **Delete a password:**
+     ```bash
+     npm run secrets:delete <password-to-delete>
+     ```
+     This will remove `<password-to-delete>` from your keyring.
+
+   - **Check all your passwords:**
+     ```bash
+     npm start
+     ```
+     or
+      ```bash
+     npm run secrets:check
+     ```
+     This command will check the integrity of all passwords stored in your keyring. Depending on your OS, a notification will pop up similar to below:
 
 ![Check My Secrets notification](https://raw.githubusercontent.com/koalyptus/check-my-secrets/v0.0.1/assets/success-screenshot.png)
 

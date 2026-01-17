@@ -8,12 +8,14 @@
   },
   "type": "module",
   "scripts": {
-    "start": "node --no-warnings bin/check-my-secrets.js",
+    "start": "npm run secrets:check",
     "format": "npx prettier --check lib/*.*js bin/*.*js",
     "format:fix": "npm run format -- --write",
     "lint": "eslint lib/*.*js bin/*.*js",
-    "secrets:list": "node --no-warnings bin/list-secrets.js",
-    "secrets:add": "node --no-warnings bin/add-secret.js",
+    "secrets:add": "node bin/add-secret.js",
+    "secrets:check": "node bin/check-my-secrets.js",
+    "secrets:delete": "node bin/delete-secret.js",
+    "secrets:list": "node bin/list-secrets.js",
     "test": "vitest",
     "test:coverage": "vitest --coverage"
   },

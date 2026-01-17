@@ -1,27 +1,55 @@
 #!/usr/bin/env node
 
 import { Entry } from '@napi-rs/keyring';
-import { DEFAULT_PASSWORDS_KEY, DEFAULT_PASSWORDS_SEPARATOR, SERVICE } from '../lib/constants.mjs';
+import { DEFAULT_PASSWORDS_KEY, DEFAULT_PASSWORDS_SEPARATOR, SERVICE, README_STORE_SECRETS } from '../lib/constants.mjs';
 import { logger } from '../lib/logger.mjs';
+import readline from 'readline';
 
-async function listSecrets() {
+function askQuestion(query) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise(resolve => rl.question(query, ans => {
+    rl.close();
+    resolve(ans);
+  }))
+}
+
+async function main() {
   const passwordsKey = process.env.PWDS_KEY || DEFAULT_PASSWORDS_KEY;
   const passwordsSeparator = process.env.PWDS_SEPARATOR || DEFAULT_PASSWORDS_SEPARATOR;
 
   try {
     const entry = new Entry(SERVICE, passwordsKey);
     const passwords = entry.getPassword();
+
+    if (passwords === null) {
+      logger.log({
+        level: 'warn',
+        message: 'Provided key is not defined in keyring. ' + README_STORE_SECRETS
+      });
+
+      return;
+    }
+
     if (passwords) {
-      const uniquePasswords = [...new Set(passwords.split(passwordsSeparator))];
-      console.table(passwords);
-      console.table(uniquePasswords);
+      const answer = await askQuestion('Are you sure you want to display the list of passwords? (y/n) ');
+      if (answer.toLowerCase() === 'y') {
+        const uniquePasswords = [...new Set(passwords.split(passwordsSeparator))];
+        console.table(uniquePasswords);
+
+        return;
+      }
+
+      logger.log({ level: 'info', message: 'List passwords action cancelled.' });
     } else {
-      logger.log({ level: 'warn', message: 'Provided key is not defined in keyring. ' + README_STORE_SECRETS });
+      logger.log({ level: 'warn', message: 'There are no passwords.' });
     }
   } catch (error) {
     logger.log({ level: 'error', message: error });
-    process.exit(1);
   }
 }
 
-listSecrets();
+main();
