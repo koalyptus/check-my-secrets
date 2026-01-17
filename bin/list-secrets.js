@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import { Entry } from '@napi-rs/keyring';
-import { DEFAULT_PASSWORDS_KEY, DEFAULT_PASSWORDS_SEPARATOR, SERVICE, README_STORE_SECRETS } from '../lib/constants.mjs';
+import { SERVICE, README_STORE_SECRETS } from '../lib/constants.mjs';
+import { config } from '../lib/config.mjs';
 import { logger } from '../lib/logger.mjs';
 import readline from 'readline';
 
@@ -18,8 +19,7 @@ function askQuestion(query) {
 }
 
 async function main() {
-  const passwordsKey = process.env.PWDS_KEY || DEFAULT_PASSWORDS_KEY;
-  const passwordsSeparator = process.env.PWDS_SEPARATOR || DEFAULT_PASSWORDS_SEPARATOR;
+  const { passwordsKey, passwordsSeparator } = config();
 
   try {
     const entry = new Entry(SERVICE, passwordsKey);

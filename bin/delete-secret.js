@@ -3,7 +3,8 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { Entry } from '@napi-rs/keyring';
-import { DEFAULT_PASSWORDS_KEY, DEFAULT_PASSWORDS_SEPARATOR, SERVICE } from '../lib/constants.mjs';
+import { SERVICE } from '../lib/constants.mjs';
+import { config } from '../lib/config.mjs';
 import { logger } from '../lib/logger.mjs';
 
 function main() {
@@ -15,8 +16,7 @@ function main() {
     return;
   }
 
-  const passwordsKey = process.env.PWDS_KEY || DEFAULT_PASSWORDS_KEY;
-  const passwordsSeparator = process.env.PWDS_SEPARATOR || DEFAULT_PASSWORDS_SEPARATOR;
+  const { passwordsKey, passwordsSeparator } = config();
 
   try {
     const entry = new Entry(SERVICE, passwordsKey);

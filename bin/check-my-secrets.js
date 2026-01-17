@@ -4,11 +4,11 @@ import { Entry } from '@napi-rs/keyring';
 import notifier from 'node-notifier';
 import { checkPasswords } from '../lib/check-passwords.mjs';
 import { logger } from '../lib/logger.mjs';
-import { DEFAULT_PASSWORDS_KEY, DEFAULT_PASSWORDS_SEPARATOR, ERR_OSSL_BAD_DECRYPT, README_STORE_SECRETS, SERVICE } from '../lib/constants.mjs';
+import { ERR_OSSL_BAD_DECRYPT, README_STORE_SECRETS, SERVICE } from '../lib/constants.mjs';
+import { config } from '../lib/config.mjs';
 
 async function main() {
-  const passwordsKey = process.env.PWDS_KEY || DEFAULT_PASSWORDS_KEY;
-  const passwordsSeparator = process.env.PWDS_SEPARATOR || DEFAULT_PASSWORDS_SEPARATOR;
+  const { passwordsKey, passwordsSeparator } = config();
 
   let passwords;
 
