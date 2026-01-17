@@ -38,7 +38,6 @@ function main() {
 
     entry.setPassword(passwords);
     logger.log({ level: 'info', message: 'Password successfully added.' });
-
   } catch (error) {
     logger.log({ level: 'error', message: `Error adding password: ${error}` });
 

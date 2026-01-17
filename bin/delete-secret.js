@@ -28,7 +28,7 @@ function main() {
     }
 
     const initialLength = passwordList.length;
-    passwordList = passwordList.filter(p => p !== passwordToDelete);
+    passwordList = passwordList.filter((p) => p !== passwordToDelete);
 
     if (passwordList.length === initialLength) {
       logger.log({ level: 'warn', message: `Password not found.` });
