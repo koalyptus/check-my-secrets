@@ -1,23 +1,20 @@
 #!/usr/bin/env node
 
-import ck from 'ckey';
-import keyring from 'keyring';
+import { Entry } from '@napi-rs/keyring';
 import notifier from 'node-notifier';
 import { checkPasswords } from '../lib/check-passwords.mjs';
 import { logger } from '../lib/logger.mjs';
-import { ERR_OSSL_BAD_DECRYPT, README_STORE_SECRETS } from '../lib/constants.mjs';
+import { ERR_OSSL_BAD_DECRYPT, README_STORE_SECRETS, SERVICE } from '../lib/constants.mjs';
+import { config } from '../lib/config.mjs';
 
 async function main() {
-  const encryptionKey = ck.ENCRYPTION_KEY || 'hello-world-123';
-  const passwordsKey = ck.PWDS_KEY || 'checkmysecrets.pwds';
-  // making the assumption commas are generally not allowed in passwords,
-  // change the separator sequence if that not the case for you
-  const passwordsSeparator = ck.PWDS_SEPARATOR || ',';
+  const { passwordsKey, passwordsSeparator } = config();
+
   let passwords;
 
   try {
-    const keyringDb = keyring.instance(encryptionKey).load();
-    passwords = keyringDb.retrieveEncrypted(passwordsKey);
+    const entry = new Entry(SERVICE, passwordsKey);
+    passwords = entry.getPassword();
   } catch (ex) {
     if (ex.code === ERR_OSSL_BAD_DECRYPT) {
       logger.log({

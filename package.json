@@ -1,6 +1,6 @@
 {
   "name": "check-my-secrets",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "NodeJS script checking whether any of the passwords used online are compromised.",
   "bin": "./bin/check-my-secrets.js",
   "engines": {
@@ -8,10 +8,16 @@
   },
   "type": "module",
   "scripts": {
-    "start": "node --no-warnings bin/check-my-secrets.js",
+    "start": "npm run secrets:check",
     "format": "npx prettier --check lib/*.*js bin/*.*js",
     "format:fix": "npm run format -- --write",
-    "lint": "eslint lib/*.*js bin/*.*js"
+    "lint": "eslint lib/*.*js bin/*.*js",
+    "secrets:add": "node bin/add-secret.js",
+    "secrets:check": "node bin/check-my-secrets.js",
+    "secrets:delete": "node bin/delete-secret.js",
+    "secrets:list": "node bin/list-secrets.js",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage"
   },
   "keywords": [
     "security",
@@ -28,14 +34,17 @@
   },
   "license": "MIT",
   "dependencies": {
-    "ckey": "^1.0.2",
-    "keyring": "^1.1.0",
+    "@napi-rs/keyring": "^1.2.0",
+    "dotenv": "^16.0.0",
     "node-fetch": "^3.3.0",
     "node-notifier": "^10.0.1",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "yargs": "^18.0.0"
   },
   "devDependencies": {
     "eslint": "^8.31.0",
-    "prettier": "^2.8.2"
+    "prettier": "^2.8.2",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
   }
 }
