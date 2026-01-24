@@ -9,7 +9,7 @@ import { logger } from '../lib/logger.mjs';
 
 function main() {
   const argv = yargs(hideBin(process.argv)).argv;
-  const passwordToDelete = argv._[0];
+  const passwordToDelete = String(argv._[0]).trim();
 
   if (!passwordToDelete) {
     logger.log({ level: 'error', message: 'Please provide a password to delete.' });
@@ -28,7 +28,7 @@ function main() {
     }
 
     const initialLength = passwordList.length;
-    passwordList = passwordList.filter((p) => p !== passwordToDelete);
+    passwordList = passwordList.filter((p) => p.trim() !== passwordToDelete);
 
     if (passwordList.length === initialLength) {
       logger.log({ level: 'warn', message: `Password not found.` });

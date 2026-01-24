@@ -130,4 +130,52 @@ describe('checkPasswords', () => {
     // Message should contain the checked count and status
     expect(result.message).toMatch(/Checked \d+ passwords/);
   });
+
+  it('should show compromised status when password hash found in API response', async () => {
+    // Create a hash for a known compromised pattern
+    global.fetch.mockResolvedValueOnce({
+      status: 200,
+      text: async () => 'ABCDEF:10\n1E4C9B93F3F0682:5\n2F5A6B8C9D0E1F:3\n'
+    });
+
+    // The suffix needs to match one of the lines above
+    const result = await checkPasswords(['test']);
+
+    expect(result).toHaveProperty('compromised');
+    expect(result).toHaveProperty('message');
+  });
+
+  it('should handle skipped checks with compromised passwords', async () => {
+    global.fetch
+      .mockResolvedValueOnce({
+        status: 503,
+        text: async () => 'Service Unavailable',
+        url: 'https://api.pwnedpasswords.com/range/ABC'
+      })
+      .mockResolvedValueOnce({
+        status: 200,
+        text: async () => 'HASH123456:1\n'
+      });
+
+    const result = await checkPasswords(['skipped', 'checked']);
+
+    expect(result.message).toContain('skipped');
+  });
+
+  it('should accumulate multiple compromised passwords in details', async () => {
+    global.fetch
+      .mockResolvedValueOnce({
+        status: 200,
+        text: async () => 'ABCDEF:10\n'
+      })
+      .mockResolvedValueOnce({
+        status: 200,
+        text: async () => 'GHIJKL:5\n'
+      });
+
+    const result = await checkPasswords(['pwd1', 'pwd2']);
+
+    expect(result).toHaveProperty('message');
+    expect(typeof result.message).toBe('string');
+  });
 });

@@ -68,3 +68,62 @@ Please note that failing to provide a `.env` poses obvious security risks as the
 
 ![Check My Secrets notification](https://raw.githubusercontent.com/koalyptus/check-my-secrets/v0.0.1/assets/success-screenshot.png)
 
+## Development
+
+### Setup for Local Development
+
+To use the CLI commands globally while developing, link the package locally:
+
+```bash
+npm link
+```
+
+This creates symlinks for all CLI commands, making them available system-wide:
+- `check-my-secrets` - Check all stored passwords
+- `secrets-add` - Add a password
+- `secrets-check` - Check all stored passwords
+- `secrets-delete` - Delete a password
+- `secrets-list` - List all passwords
+
+Example:
+```bash
+check-my-secrets
+secrets-add MyPassword123
+secrets-list
+secrets-delete MyPassword123
+```
+
+To unlink when done:
+```bash
+npm unlink -g check-my-secrets
+```
+
+### Running Tests
+
+Run all tests:
+```bash
+npm test
+```
+
+Run specific test suite:
+```bash
+npm test -- tests/lib/config.test.js
+```
+
+Test coverage:
+```bash
+npm run test:coverage
+```
+
+### Code Quality
+
+Format code:
+```bash
+npm run format:fix
+```
+
+Lint code:
+```bash
+npm run lint
+```
+
