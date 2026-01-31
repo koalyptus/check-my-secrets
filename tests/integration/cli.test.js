@@ -1,10 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { execSync } from 'child_process';
 import path from 'path';
+import { existsSync, unlinkSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
+import { homedir } from 'os';
 
 const projectRoot = path.resolve('.');
 
 describe('CLI Integration Tests', () => {
+
   describe('add-secret.js', () => {
     it('should show error when no password provided', () => {
       try {
@@ -71,6 +74,63 @@ describe('CLI Integration Tests', () => {
     });
   });
 
+  describe('setup.js', () => {
+    const realConfigDir = path.join(homedir(), '.check-my-secrets');
+    const realEnvFilePath = path.join(realConfigDir, '.env');
+
+    beforeEach(() => {
+      // Clean up any existing .env file before testing
+      if (existsSync(realEnvFilePath)) {
+        unlinkSync(realEnvFilePath);
+      }
+    });
+
+    afterEach(() => {
+      // Clean up after tests
+      if (existsSync(realEnvFilePath)) {
+        unlinkSync(realEnvFilePath);
+      }
+    });
+
+    it('should create the config directory and default .env file', () => {
+      // Remove .env if it exists
+      if (existsSync(realEnvFilePath)) {
+        unlinkSync(realEnvFilePath);
+      }
+
+      const output = execSync('node bin/setup.js', {
+        cwd: projectRoot,
+        stdio: 'pipe'
+      }).toString();
+
+      expect(existsSync(realConfigDir)).toBe(true);
+      expect(existsSync(realEnvFilePath)).toBe(true);
+      expect(output).toContain('Config directory ensured:');
+      expect(output).toContain('Default .env file created:');
+
+      const envContent = readFileSync(realEnvFilePath, 'utf-8');
+      expect(envContent).toContain('PWDS_KEY=checkmysecrets.pwds');
+      expect(envContent).toContain('PWDS_SEPARATOR=,');
+    });
+
+    it('should not overwrite an existing .env file', () => {
+      // Create the directory and a custom .env file
+      mkdirSync(realConfigDir, { recursive: true });
+      const customEnvContent = 'PWDS_KEY=custom.key\nPWDS_SEPARATOR=;\n';
+      writeFileSync(realEnvFilePath, customEnvContent);
+
+      const output = execSync('node bin/setup.js', {
+        cwd: projectRoot,
+        stdio: 'pipe'
+      }).toString();
+
+      expect(output).toContain('.env file already exists at:');
+
+      const envContent = readFileSync(realEnvFilePath, 'utf-8');
+      expect(envContent).toBe(customEnvContent);
+    });
+  });
+
   describe('npm scripts', () => {
     it('should have secrets:add script', () => {
       try {
@@ -120,6 +180,13 @@ describe('CLI Integration Tests', () => {
       } catch (error) {
         expect(error).toBeDefined();
       }
+    });
+    it('should have setup script', () => {
+      const output = execSync('npm run 2>&1', {
+        cwd: projectRoot,
+        stdio: 'pipe'
+      }).toString();
+      expect(output).toContain('setup');
     });
   });
 });
