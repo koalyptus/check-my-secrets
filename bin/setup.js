@@ -3,9 +3,9 @@
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { DEFAULT_PASSWORDS_KEY, DEFAULT_PASSWORDS_SEPARATOR } from '../lib/constants.mjs';
+import { DEFAULT_PASSWORDS_KEY, DEFAULT_PASSWORDS_SEPARATOR, CONFIG_DIR } from '../lib/constants.mjs';
 
-const configDir = join(homedir(), '.check-my-secrets');
+const configDir = join(homedir(), CONFIG_DIR);
 const envFilePath = join(configDir, '.env');
 
 try {

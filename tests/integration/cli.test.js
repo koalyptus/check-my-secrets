@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import path from 'path';
 import { existsSync, unlinkSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { homedir } from 'os';
+import { CONFIG_DIR } from '../../lib/constants.mjs';
 
 const projectRoot = path.resolve('.');
 
@@ -75,7 +76,7 @@ describe('CLI Integration Tests', () => {
   });
 
   describe('setup.js', () => {
-    const realConfigDir = path.join(homedir(), '.check-my-secrets');
+    const realConfigDir = path.join(homedir(), CONFIG_DIR);
     const realEnvFilePath = path.join(realConfigDir, '.env');
 
     beforeEach(() => {
