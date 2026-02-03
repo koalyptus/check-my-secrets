@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { execSync } from 'child_process';
 import path from 'path';
-import { existsSync, unlinkSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
-import { homedir } from 'os';
+import { existsSync, unlinkSync, mkdirSync, writeFileSync, readFileSync, mkdtempSync, rmSync } from 'fs';
+import { tmpdir } from 'os';
 import { CONFIG_DIR } from '../../lib/constants.mjs';
 
 const projectRoot = path.resolve('.');
@@ -76,58 +76,67 @@ describe('CLI Integration Tests', () => {
   });
 
   describe('setup.js', () => {
-    const realConfigDir = path.join(homedir(), CONFIG_DIR);
-    const realEnvFilePath = path.join(realConfigDir, '.env');
+    // Use a temp HOME for tests to avoid touching the real user's home
+    let tempHome;
+    let childEnv;
+    const tmpPrefix = 'check-my-secrets-test-';
 
     beforeEach(() => {
-      // Clean up any existing .env file before testing
-      if (existsSync(realEnvFilePath)) {
-        unlinkSync(realEnvFilePath);
-      }
+      tempHome = mkdtempSync(path.join(tmpdir(), tmpPrefix));
+      childEnv = { ...process.env, HOME: tempHome, USERPROFILE: tempHome };
     });
 
     afterEach(() => {
-      // Clean up after tests
-      if (existsSync(realEnvFilePath)) {
-        unlinkSync(realEnvFilePath);
+      try {
+        rmSync(tempHome, { recursive: true, force: true });
+      } catch (e) {
+        // ignore cleanup errors
       }
     });
 
     it('should create the config directory and default .env file', () => {
-      // Remove .env if it exists
-      if (existsSync(realEnvFilePath)) {
-        unlinkSync(realEnvFilePath);
+      const testConfigDir = path.join(tempHome, CONFIG_DIR);
+      const testEnvPath = path.join(testConfigDir, '.env');
+
+      // Ensure clean state
+      if (existsSync(testEnvPath)) {
+        unlinkSync(testEnvPath);
       }
 
       const output = execSync('node bin/setup.js', {
         cwd: projectRoot,
-        stdio: 'pipe'
+        stdio: 'pipe',
+        env: childEnv
       }).toString();
 
-      expect(existsSync(realConfigDir)).toBe(true);
-      expect(existsSync(realEnvFilePath)).toBe(true);
+      expect(existsSync(testConfigDir)).toBe(true);
+      expect(existsSync(testEnvPath)).toBe(true);
       expect(output).toContain('Config directory ensured:');
       expect(output).toContain('Default .env file created:');
 
-      const envContent = readFileSync(realEnvFilePath, 'utf-8');
+      const envContent = readFileSync(testEnvPath, 'utf-8');
       expect(envContent).toContain('PWDS_KEY=checkmysecrets.pwds');
       expect(envContent).toContain('PWDS_SEPARATOR=,');
     });
 
     it('should not overwrite an existing .env file', () => {
+      const testConfigDir = path.join(tempHome, CONFIG_DIR);
+      const testEnvPath = path.join(testConfigDir, '.env');
+
       // Create the directory and a custom .env file
-      mkdirSync(realConfigDir, { recursive: true });
+      mkdirSync(testConfigDir, { recursive: true });
       const customEnvContent = 'PWDS_KEY=custom.key\nPWDS_SEPARATOR=;\n';
-      writeFileSync(realEnvFilePath, customEnvContent);
+      writeFileSync(testEnvPath, customEnvContent);
 
       const output = execSync('node bin/setup.js', {
         cwd: projectRoot,
-        stdio: 'pipe'
+        stdio: 'pipe',
+        env: childEnv
       }).toString();
 
       expect(output).toContain('.env file already exists at:');
 
-      const envContent = readFileSync(realEnvFilePath, 'utf-8');
+      const envContent = readFileSync(testEnvPath, 'utf-8');
       expect(envContent).toBe(customEnvContent);
     });
   });
