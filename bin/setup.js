@@ -12,7 +12,8 @@ try {
   mkdirSync(configDir, { recursive: true });
   console.log(`Config directory ensured: ${configDir}`);
 
-  const envContent = `# Key used by Keyring to store the label for your passwords\n` +
+  const envContent =
+    `# Key used by Keyring to store the label for your passwords\n` +
     `# This is an identifier stored in your keyring; do NOT store encryption keys here.\n` +
     `PWDS_KEY=${DEFAULT_PASSWORDS_KEY}\n\n` +
     `# Symbol used to separate passwords\n` +
