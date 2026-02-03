@@ -6,6 +6,7 @@ import { checkPasswords } from '../lib/check-passwords.mjs';
 import { logger } from '../lib/logger.mjs';
 import { ERR_OSSL_BAD_DECRYPT, README_STORE_SECRETS, SERVICE } from '../lib/constants.mjs';
 import { config } from '../lib/config.mjs';
+import { errorIconPath, successIconPath } from '../lib/assets.mjs';
 
 async function main() {
   const { passwordsKey, passwordsSeparator } = config();
@@ -68,7 +69,7 @@ async function main() {
   notifier.notify({
     appID: 'Check My Secrets',
     title: 'Scan result',
-    icon: compromised ? 'assets/Error.png' : 'assets/CompleteCheckmark.png',
+    icon: compromised ? errorIconPath : successIconPath,
     message
   });
 }

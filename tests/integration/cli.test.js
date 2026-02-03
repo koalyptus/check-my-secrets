@@ -183,11 +183,8 @@ describe('CLI Integration Tests', () => {
       }
     });
     it('should have setup script', () => {
-      const output = execSync('npm run 2>&1', {
-        cwd: projectRoot,
-        stdio: 'pipe'
-      }).toString();
-      expect(output).toContain('setup');
+      const pkg = JSON.parse(readFileSync(path.join(projectRoot, 'package.json'), 'utf8'));
+      expect(pkg.scripts && pkg.scripts.setup).toBeDefined();
     });
   });
 });
