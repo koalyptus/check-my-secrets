@@ -1,10 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { execSync } from 'child_process';
 import path from 'path';
+import { existsSync, unlinkSync, mkdirSync, writeFileSync, readFileSync, mkdtempSync, rmSync } from 'fs';
+import { tmpdir } from 'os';
+import { CONFIG_DIR } from '../../lib/constants.mjs';
 
 const projectRoot = path.resolve('.');
 
 describe('CLI Integration Tests', () => {
+
   describe('add-secret.js', () => {
     it('should show error when no password provided', () => {
       try {
@@ -71,6 +75,72 @@ describe('CLI Integration Tests', () => {
     });
   });
 
+  describe('setup.js', () => {
+    // Use a temp HOME for tests to avoid touching the real user's home
+    let tempHome;
+    let childEnv;
+    const tmpPrefix = 'check-my-secrets-test-';
+
+    beforeEach(() => {
+      tempHome = mkdtempSync(path.join(tmpdir(), tmpPrefix));
+      childEnv = { ...process.env, HOME: tempHome, USERPROFILE: tempHome };
+    });
+
+    afterEach(() => {
+      try {
+        rmSync(tempHome, { recursive: true, force: true });
+      } catch (e) {
+        // ignore cleanup errors
+      }
+    });
+
+    it('should create the config directory and default .env file', () => {
+      const testConfigDir = path.join(tempHome, CONFIG_DIR);
+      const testEnvPath = path.join(testConfigDir, '.env');
+
+      // Ensure clean state
+      if (existsSync(testEnvPath)) {
+        unlinkSync(testEnvPath);
+      }
+
+      const output = execSync('node bin/setup.js', {
+        cwd: projectRoot,
+        stdio: 'pipe',
+        env: childEnv
+      }).toString();
+
+      expect(existsSync(testConfigDir)).toBe(true);
+      expect(existsSync(testEnvPath)).toBe(true);
+      expect(output).toContain('Config directory ensured:');
+      expect(output).toContain('Default .env file created:');
+
+      const envContent = readFileSync(testEnvPath, 'utf-8');
+      expect(envContent).toContain('PWDS_KEY=checkmysecrets.pwds');
+      expect(envContent).toContain('PWDS_SEPARATOR=,');
+    });
+
+    it('should not overwrite an existing .env file', () => {
+      const testConfigDir = path.join(tempHome, CONFIG_DIR);
+      const testEnvPath = path.join(testConfigDir, '.env');
+
+      // Create the directory and a custom .env file
+      mkdirSync(testConfigDir, { recursive: true });
+      const customEnvContent = 'PWDS_KEY=custom.key\nPWDS_SEPARATOR=;\n';
+      writeFileSync(testEnvPath, customEnvContent);
+
+      const output = execSync('node bin/setup.js', {
+        cwd: projectRoot,
+        stdio: 'pipe',
+        env: childEnv
+      }).toString();
+
+      expect(output).toContain('.env file already exists at:');
+
+      const envContent = readFileSync(testEnvPath, 'utf-8');
+      expect(envContent).toBe(customEnvContent);
+    });
+  });
+
   describe('npm scripts', () => {
     it('should have secrets:add script', () => {
       try {
@@ -120,6 +190,10 @@ describe('CLI Integration Tests', () => {
       } catch (error) {
         expect(error).toBeDefined();
       }
+    });
+    it('should have setup script', () => {
+      const pkg = JSON.parse(readFileSync(path.join(projectRoot, 'package.json'), 'utf8'));
+      expect(pkg.scripts && pkg.scripts.setup).toBeDefined();
     });
   });
 });

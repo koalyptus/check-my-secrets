@@ -1,13 +1,14 @@
 {
   "name": "check-my-secrets",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "NodeJS script checking whether any of the passwords used online are compromised.",
   "bin": {
     "check-my-secrets": "./bin/check-my-secrets.js",
     "secrets-add": "./bin/add-secret.js",
     "secrets-check": "./bin/check-my-secrets.js",
     "secrets-delete": "./bin/delete-secret.js",
-    "secrets-list": "./bin/list-secrets.js"
+    "secrets-list": "./bin/list-secrets.js",
+    "secrets-setup": "./bin/setup.js"
   },
   "engines": {
     "node": ">=17"
@@ -18,6 +19,7 @@
     "format": "npx prettier --check lib/*.*js bin/*.*js",
     "format:fix": "npm run format -- --write",
     "lint": "eslint lib/*.*js bin/*.*js",
+    "setup": "node bin/setup.js",
     "secrets:add": "node bin/add-secret.js",
     "secrets:check": "node bin/check-my-secrets.js",
     "secrets:delete": "node bin/delete-secret.js",

@@ -19,22 +19,27 @@ git clone https://github.com/koalyptus/check-my-secrets.git
 npm install
 ```
 
-3. Create a `.env` file at same location of this README with following definitions:
+3. Run the setup command to create your global config folder and a default `.env` file:
+
 ```bash
-# Replace the curly brackets too!
-
-# Key used by Keyring to store the comma (or symbol of your choice) separated passwords
-PWDS_KEY=checkmysecrets.{your-key-for-passwords}
-
-# Symbol used to separate passwords, defaults to `,`
-PWDS_SEPARATOR={separator_here}
+npm run setup
 ```
-:warning: If env file is not present the script will default to following values in same order of appearance in `.env` file:
+
+This will create a folder at `~/.check-my-secrets` and place a default `.env` file inside it. You can then open this `.env` file in your preferred text editor to customize your `PWDS_KEY` and `PWDS_SEPARATOR`.
+
+:warning: The CLI loads configuration from the single global location: `~/.check-my-secrets/.env`.
+If this file is not present, or if `PWDS_KEY` or `PWDS_SEPARATOR` are not defined within it, the script will fall back to the built-in defaults:
+
 ```bash
 checkmysecrets.pwds
 ,
 ```
-Please note that failing to provide a `.env` poses obvious security risks as the key is publicly disclosed here.
+
+Security notes:
+
+- `PWDS_KEY` is only a keyring identifier (safe to store). Do NOT store the actual encryption key or plaintext secrets in this file.
+- Restrict file permissions so only your user can read it (on Unix: `chmod 600 ~/.check-my-secrets/.env`).
+- On Windows, ensure the file ACL only grants access to your user account.
 
 4. Manage your passwords using the following commands:
 
