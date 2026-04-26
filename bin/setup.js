@@ -3,7 +3,12 @@
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { DEFAULT_PASSWORDS_KEY, DEFAULT_PASSWORDS_SEPARATOR, CONFIG_DIR } from '../lib/constants.mjs';
+import {
+  DEFAULT_PASSWORDS_KEY,
+  DEFAULT_PASSWORDS_SEPARATOR,
+  DEFAULT_INPUT_MODE,
+  CONFIG_DIR
+} from '../lib/constants.mjs';
 
 const configDir = join(homedir(), CONFIG_DIR);
 const envFilePath = join(configDir, '.env');
@@ -17,7 +22,9 @@ try {
     `# This is an identifier stored in your keyring; do NOT store encryption keys here.\n` +
     `PWDS_KEY=${DEFAULT_PASSWORDS_KEY}\n\n` +
     `# Symbol used to separate passwords\n` +
-    `PWDS_SEPARATOR=${DEFAULT_PASSWORDS_SEPARATOR}\n`;
+    `PWDS_SEPARATOR=${DEFAULT_PASSWORDS_SEPARATOR}\n\n` +
+    `# Input mode for adding/deleting passwords: 'prompt' (hidden) or 'cli' (visible arguments)\n` +
+    `# PWDS_INPUT_MODE=${DEFAULT_INPUT_MODE}\n`;
 
   writeFileSync(envFilePath, envContent, { flag: 'wx' }); // 'wx' to create and write, error if exists
   console.log(`Default .env file created: ${envFilePath}`);
