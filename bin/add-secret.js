@@ -11,8 +11,8 @@ function main() {
   const argv = yargs(hideBin(process.argv)).argv;
   const newPassword = argv._[0];
 
-  if (!newPassword) {
-    logger.log({ level: 'error', message: 'Please provide a password to add.' });
+  if (!newPassword || newPassword.trim() === '') {
+    logger.log({ level: 'error', message: 'Please provide a non-empty password to add.' });
     return;
   }
 
