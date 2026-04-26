@@ -104,11 +104,10 @@ async function confirmAndDelete(passwordToDelete, inputMode) {
     console.log(`Stored password: ${masked}`);
 
     if (inputMode === 'prompt') {
-      console.log('Press any key to reveal, or Enter to confirm deletion');
+      console.log('Type any character and press Enter to reveal, or press Enter to delete');
       const reveal = await askQuestion('');
-      if (reveal !== '\n' && reveal !== '') {
+      if (reveal.trim() !== '') {
         console.log(`Stored password: ${storedPassword}`);
-        await askQuestion('Press Enter to continue');
       }
     }
 
