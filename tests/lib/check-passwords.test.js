@@ -159,7 +159,7 @@ describe('checkPasswords', () => {
 
     const result = await checkPasswords(['skipped', 'checked']);
 
-    expect(result.message).toContain('skipped');
+    expect(result.message).toContain('sk***ed');
   });
 
   it('should accumulate multiple compromised passwords in details', async () => {
