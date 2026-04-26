@@ -4,21 +4,7 @@ import { Entry } from '@napi-rs/keyring';
 import { SERVICE, README_STORE_SECRETS } from '../lib/constants.mjs';
 import { config } from '../lib/config.mjs';
 import { logger } from '../lib/logger.mjs';
-import readline from 'readline';
-
-function askQuestion(query) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-
-  return new Promise((resolve) =>
-    rl.question(query, (ans) => {
-      rl.close();
-      resolve(ans);
-    })
-  );
-}
+import { askQuestion } from '../lib/input.mjs';
 
 async function main() {
   const { passwordsKey, passwordsSeparator } = config();
