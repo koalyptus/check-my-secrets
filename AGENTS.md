@@ -12,10 +12,12 @@ Node.js CLI tool (ESM modules) that checks if stored passwords are compromised u
 - **Setup config:** `npm run setup` (creates `~/.check-my-secrets/.env`)
 
 ## Secret Management Commands
-- `npm run secrets:add <password>` - Add a password to keyring
+- `npm run secrets:add` - Add a password (hidden input by default)
 - `npm run secrets:list` - List all stored passwords
-- `npm run secrets:delete <password>` - Delete a password
+- `npm run secrets:delete` - Delete a password (hidden input by default)
 - `npm run secrets:check` - Check all passwords (also `npm start`)
+
+Use `PWDS_INPUT_MODE=cli` in `.env` to use visible CLI arguments instead.
 
 ## Important Notes
 - Requires Node >= 17
