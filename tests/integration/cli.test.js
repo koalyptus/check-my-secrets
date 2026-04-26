@@ -134,7 +134,8 @@ describe('CLI Integration Tests', () => {
         env: childEnv
       }).toString();
 
-      expect(output).toContain('.env file updated with new options:');
+      expect(output).toContain('.env file updated with:');
+      expect(output).toContain('PWDS_INPUT_MODE');
 
       const envContent = readFileSync(testEnvPath, 'utf-8');
       expect(envContent).toContain('PWDS_KEY=custom.key');

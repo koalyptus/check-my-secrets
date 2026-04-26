@@ -3,37 +3,22 @@
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
-import {
-  DEFAULT_PASSWORDS_KEY,
-  DEFAULT_PASSWORDS_SEPARATOR,
-  DEFAULT_INPUT_MODE,
-  CONFIG_DIR
-} from '../lib/constants.mjs';
+import { CONFIG_DIR } from '../lib/constants.mjs';
+import { DEFAULT_OPTIONS } from '../lib/config.mjs';
 
 const configDir = join(homedir(), CONFIG_DIR);
 const envFilePath = join(configDir, '.env');
-
-const newOptions = [
-  {
-    key: 'PWDS_INPUT_MODE',
-    value: DEFAULT_INPUT_MODE,
-    comment: "Input mode for adding/deleting passwords: 'prompt' (hidden) or 'cli' (visible arguments)"
-  }
-];
 
 try {
   mkdirSync(configDir, { recursive: true });
   console.log(`Config directory ensured: ${configDir}`);
 
   if (!existsSync(envFilePath)) {
-    const envContent =
-      `# Key used by Keyring to store the label for your passwords\n` +
-      `# This is an identifier stored in your keyring; do NOT store encryption keys here.\n` +
-      `PWDS_KEY=${DEFAULT_PASSWORDS_KEY}\n\n` +
-      `# Symbol used to separate passwords\n` +
-      `PWDS_SEPARATOR=${DEFAULT_PASSWORDS_SEPARATOR}\n\n` +
-      `# Input mode for adding/deleting passwords: 'prompt' (hidden) or 'cli' (visible arguments)\n` +
-      `# PWDS_INPUT_MODE=${DEFAULT_INPUT_MODE}\n`;
+    let envContent = '';
+    for (const option of DEFAULT_OPTIONS) {
+      envContent += `# ${option.comment}\n${option.key}=${option.value}\n\n`;
+    }
+    envContent = envContent.trimEnd();
 
     writeFileSync(envFilePath, envContent);
     console.log(`Default .env file created: ${envFilePath}`);
@@ -48,16 +33,18 @@ try {
     );
 
     let mergedContent = existingContent.trim();
+    const addedKeys = [];
 
-    for (const option of newOptions) {
+    for (const option of DEFAULT_OPTIONS) {
       if (!existingKeys.has(option.key)) {
         mergedContent += `\n\n# ${option.comment}\n${option.key}=${option.value}\n`;
+        addedKeys.push(option.key);
       }
     }
 
-    if (mergedContent !== existingContent.trim()) {
+    if (addedKeys.length > 0) {
       writeFileSync(envFilePath, mergedContent + '\n');
-      console.log(`.env file updated with new options: ${envFilePath}`);
+      console.log(`.env file updated with: ${addedKeys.join(', ')}`);
     } else {
       console.log(`.env file already up to date: ${envFilePath}`);
     }
