@@ -35,6 +35,13 @@ checkmysecrets.pwds
 ,
 ```
 
+### Input Mode Configuration
+
+By default, passwords are entered using a hidden prompt (recommended). You can change this in your `.env` file:
+
+- `PWDS_INPUT_MODE=prompt` (default) - Enter passwords via hidden input with masked characters
+- `PWDS_INPUT_MODE=cli` - Pass passwords as visible command line arguments
+
 Security notes:
 
 - `PWDS_KEY` is only a keyring identifier (safe to store). Do NOT store the actual encryption key or plaintext secrets in this file.
@@ -45,9 +52,9 @@ Security notes:
 
    - **Add a password:**
      ```bash
-     npm run secrets:add <your-password>
+     npm run secrets:add
      ```
-     This will add `<your-password>` to your keyring. If the password already exists, it will not be added again.
+     With default `prompt` mode, password input is hidden. You'll be asked to confirm before saving. Press any key to reveal, Enter to save.
 
    - **List all stored passwords:**
      ```bash
@@ -57,9 +64,9 @@ Security notes:
 
    - **Delete a password:**
      ```bash
-     npm run secrets:delete <password-to-delete>
+     npm run secrets:delete
      ```
-     This will remove `<password-to-delete>` from your keyring.
+     Enter the password to delete (hidden in prompt mode). You'll see the stored password masked and confirm before deletion.
 
    - **Check all your passwords:**
      ```bash

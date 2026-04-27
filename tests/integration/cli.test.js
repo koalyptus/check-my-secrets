@@ -119,7 +119,7 @@ describe('CLI Integration Tests', () => {
       expect(envContent).toContain('PWDS_SEPARATOR=,');
     });
 
-    it('should not overwrite an existing .env file', () => {
+    it('should merge new options into existing .env file', () => {
       const testConfigDir = path.join(tempHome, CONFIG_DIR);
       const testEnvPath = path.join(testConfigDir, '.env');
 
@@ -134,10 +134,13 @@ describe('CLI Integration Tests', () => {
         env: childEnv
       }).toString();
 
-      expect(output).toContain('.env file already exists at:');
+      expect(output).toContain('.env file updated with:');
+      expect(output).toContain('PWDS_INPUT_MODE');
 
       const envContent = readFileSync(testEnvPath, 'utf-8');
-      expect(envContent).toBe(customEnvContent);
+      expect(envContent).toContain('PWDS_KEY=custom.key');
+      expect(envContent).toContain('PWDS_SEPARATOR=;');
+      expect(envContent).toContain('PWDS_INPUT_MODE=prompt');
     });
   });
 
