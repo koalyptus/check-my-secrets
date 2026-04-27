@@ -61,11 +61,11 @@ describe('logger', () => {
     expect(logger.format).toBeDefined();
   });
 
-  it('should have file transport configured', () => {
+  it('should not have file transport in test environment', () => {
     const hasFileTransport = logger.transports.some(
       transport => transport.constructor.name === 'File'
     );
-    expect(hasFileTransport).toBe(true);
+    expect(hasFileTransport).toBe(false);
   });
 
   it('should have console transport configured', () => {
