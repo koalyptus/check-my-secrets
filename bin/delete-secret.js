@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { isMain } from '../lib/is-main.mjs';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { Entry } from '@napi-rs/keyring';
@@ -37,7 +38,7 @@ async function getPassword() {
   return { passwordToDelete, inputMode };
 }
 
-async function confirmAndDelete(passwordToDelete, inputMode) {
+export async function confirmAndDelete(passwordToDelete, inputMode) {
   const { passwordsKey, passwordsSeparator } = config();
 
   try {
@@ -81,8 +82,12 @@ async function confirmAndDelete(passwordToDelete, inputMode) {
     if (passwordList.length === initialLength) {
       logger.log({ level: 'warn', message: 'Password not found.' });
     } else {
-      passwords = passwordList.join(passwordsSeparator);
-      entry.setPassword(passwords);
+      if (passwordList.length === 0) {
+        entry.deletePassword();
+      } else {
+        passwords = passwordList.join(passwordsSeparator);
+        entry.setPassword(passwords);
+      }
       logger.log({ level: 'info', message: 'Password successfully deleted.' });
     }
   } catch (error) {
@@ -100,4 +105,6 @@ async function main() {
   await confirmAndDelete(result.passwordToDelete, result.inputMode);
 }
 
-main();
+if (isMain(import.meta.url)) {
+  main();
+}

@@ -10,7 +10,6 @@ export default defineConfig({
       reporter: ['text', 'json'],
       exclude: [
         'node_modules/',
-        'bin/',
         'tests/',
       ],
     },
