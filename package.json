@@ -1,6 +1,6 @@
 {
   "name": "check-my-secrets",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "NodeJS script checking whether any of the passwords used online are compromised.",
   "bin": {
     "check-my-secrets": "./bin/check-my-secrets.js",
