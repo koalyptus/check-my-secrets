@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { checkPasswords } from '../../lib/check-passwords.mjs';
+import { createHash } from 'node:crypto';
 
-// Mock fetch globally
-global.fetch = vi.fn();
+vi.mock('node-fetch', () => ({ default: vi.fn() }));
+
+import fetch from 'node-fetch';
+import { checkPasswords } from '../../lib/check-passwords.mjs';
 
 describe('checkPasswords', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch.mockClear();
   });
 
   afterEach(() => {
@@ -30,7 +31,7 @@ describe('checkPasswords', () => {
   });
 
   it('should skip empty and whitespace passwords', async () => {
-    global.fetch.mockResolvedValueOnce({
+    vi.mocked(fetch).mockResolvedValueOnce({
       status: 200,
       text: async () => '000D4F6E8FA6EECAD2A3AA415EEC418D65E:1\n'
     });
@@ -41,7 +42,7 @@ describe('checkPasswords', () => {
   });
 
   it('should return object with compromised and message properties', async () => {
-    global.fetch.mockResolvedValueOnce({
+    vi.mocked(fetch).mockResolvedValueOnce({
       status: 200,
       text: async () => '000D4F6E8FA6EECAD2A3AA415EEC418D65E:1\n'
     });
@@ -55,7 +56,7 @@ describe('checkPasswords', () => {
   });
 
   it('should call fetch for each non-empty password', async () => {
-    global.fetch.mockResolvedValue({
+    vi.mocked(fetch).mockResolvedValue({
       status: 200,
       text: async () => '000D4F6E8FA6EECAD2A3AA415EEC418D65E:1\n'
     });
@@ -66,24 +67,21 @@ describe('checkPasswords', () => {
   });
 
   it('should include password in message when compromised', async () => {
-    // Mock a response where the hash is found (compromised)
-    global.fetch.mockResolvedValueOnce({
+    vi.mocked(fetch).mockResolvedValueOnce({
       status: 200,
       text: async () => {
-        // Return a response where the hash suffix is present
         return 'ABCDEF:10\n000D4F6E8FA6EECAD2A3AA415EEC418D65E:1\n';
       }
     });
 
     const result = await checkPasswords(['test']);
 
-    // The result structure should have a message property
     expect(result).toHaveProperty('message');
     expect(typeof result.message).toBe('string');
   });
 
   it('should handle error response status gracefully', async () => {
-    global.fetch.mockResolvedValueOnce({
+    vi.mocked(fetch).mockResolvedValueOnce({
       status: 503,
       text: async () => 'Service Unavailable',
       url: 'https://api.pwnedpasswords.com/range/ABC12'
@@ -91,23 +89,21 @@ describe('checkPasswords', () => {
 
     const result = await checkPasswords(['test']);
 
-    // Should handle gracefully and not crash
-    expect(result).toHaveProperty('message');
-    expect(result).toHaveProperty('compromised');
+    expect(result.message).toBe('Checked 1 passwords, 1 skipped, 0 compromised.');
+    expect(result.compromised).toBe(false);
   });
 
   it('should handle fetch network error gracefully', async () => {
-    global.fetch.mockRejectedValueOnce(new Error('Network timeout'));
+    vi.mocked(fetch).mockRejectedValueOnce(new Error('Network timeout'));
 
     const result = await checkPasswords(['test']);
 
-    // Should handle gracefully and not crash
-    expect(result).toHaveProperty('message');
-    expect(result).toHaveProperty('compromised');
+    expect(result.message).toBe('Checked 1 passwords, 1 skipped, 0 compromised.');
+    expect(result.compromised).toBe(false);
   });
 
   it('should trim whitespace from passwords before processing', async () => {
-    global.fetch.mockResolvedValueOnce({
+    vi.mocked(fetch).mockResolvedValueOnce({
       status: 200,
       text: async () => '000D4F6E8FA6EECAD2A3AA415EEC418D65E:1\n'
     });
@@ -115,38 +111,34 @@ describe('checkPasswords', () => {
     const result = await checkPasswords(['  spaced password  ']);
 
     expect(result).toHaveProperty('message');
-    // Should not crash due to whitespace
     expect(result.message).toContain('Checked 1 passwords');
   });
 
   it('should return correct message format for unchecked passwords', async () => {
-    global.fetch.mockResolvedValueOnce({
+    vi.mocked(fetch).mockResolvedValueOnce({
       status: 200,
       text: async () => '000D4F6E8FA6EECAD2A3AA415EEC418D65E:1\n'
     });
 
     const result = await checkPasswords(['test']);
 
-    // Message should contain the checked count and status
     expect(result.message).toMatch(/Checked \d+ passwords/);
   });
 
   it('should show compromised status when password hash found in API response', async () => {
-    // Create a hash for a known compromised pattern
-    global.fetch.mockResolvedValueOnce({
+    vi.mocked(fetch).mockResolvedValueOnce({
       status: 200,
       text: async () => 'ABCDEF:10\n1E4C9B93F3F0682:5\n2F5A6B8C9D0E1F:3\n'
     });
 
-    // The suffix needs to match one of the lines above
     const result = await checkPasswords(['test']);
 
     expect(result).toHaveProperty('compromised');
     expect(result).toHaveProperty('message');
   });
 
-  it('should handle skipped checks with compromised passwords', async () => {
-    global.fetch
+  it('should handle skipped checks without compromised passwords', async () => {
+    vi.mocked(fetch)
       .mockResolvedValueOnce({
         status: 503,
         text: async () => 'Service Unavailable',
@@ -157,13 +149,65 @@ describe('checkPasswords', () => {
         text: async () => 'HASH123456:1\n'
       });
 
-    const result = await checkPasswords(['skipped', 'checked']);
+    const result = await checkPasswords(['skipped', 'notfound']);
 
-    expect(result.message).toContain('sk***ed');
+    expect(result.compromised).toBe(false);
+    expect(result.message).toBe('Checked 2 passwords, 1 skipped, 0 compromised.');
+  });
+
+  it('should handle skipped checks with one compromised and one skipped', async () => {
+    const compromisedPwd = 'pwned!';
+    const hash = createHash('sha1').update(compromisedPwd).digest('hex').toUpperCase();
+    const suffix = hash.slice(5);
+
+    vi.mocked(fetch)
+      .mockResolvedValueOnce({
+        status: 503,
+        text: async () => 'Service Unavailable',
+        url: 'https://api.pwnedpasswords.com/range/ABC12'
+      })
+      .mockResolvedValueOnce({
+        status: 200,
+        text: async () => `${suffix}:42\n`
+      });
+
+    const result = await checkPasswords(['error', compromisedPwd]);
+
+    expect(result.compromised).toBe(true);
+    expect(result.message).toContain('1 skipped, 1 compromised');
+  });
+
+  it('should return compromised when all passwords are compromised (none skipped)', async () => {
+    const shortPwd = 'booh';
+    const shortHash = createHash('sha1').update(shortPwd).digest('hex').toUpperCase();
+    const shortSuffix = shortHash.slice(5);
+
+    const longPwd = 'leaked!';
+    const longHash = createHash('sha1').update(longPwd).digest('hex').toUpperCase();
+    const longSuffix = longHash.slice(5);
+
+    vi.mocked(fetch)
+      .mockResolvedValueOnce({
+        status: 200,
+        text: async () => `${shortSuffix}:1\n`
+      })
+      .mockResolvedValueOnce({
+        status: 200,
+        text: async () => `${longSuffix}:99\n`
+      });
+
+    const result = await checkPasswords([shortPwd, longPwd]);
+
+    expect(result.compromised).toBe(true);
+    expect(result.message).toContain('2 compromised');
+    expect(result.message).toContain("'****'");
+    expect(result.message).toContain("'le***d!'");
   });
 
   it('should accumulate multiple compromised passwords in details', async () => {
-    global.fetch
+    // For two different passwords, their hash suffixes are not 'ABCDEF' or 'GHIJKL'
+    // so neither will match — both return not-compromised.
+    vi.mocked(fetch)
       .mockResolvedValueOnce({
         status: 200,
         text: async () => 'ABCDEF:10\n'
@@ -175,7 +219,6 @@ describe('checkPasswords', () => {
 
     const result = await checkPasswords(['pwd1', 'pwd2']);
 
-    expect(result).toHaveProperty('message');
-    expect(typeof result.message).toBe('string');
+    expect(result.message).toBe('Checked 2 passwords, 0 compromised.');
   });
 });

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { isMain } from '../lib/is-main.mjs';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { Entry } from '@napi-rs/keyring';
@@ -38,7 +39,7 @@ async function getPassword() {
   return { newPassword, inputMode };
 }
 
-async function confirmAndSave(newPassword, inputMode) {
+export async function confirmAndSave(newPassword, inputMode) {
   const { passwordsKey, passwordsSeparator } = config();
 
   const masked = maskPassword(newPassword);
@@ -97,4 +98,6 @@ async function main() {
   await confirmAndSave(result.newPassword, result.inputMode);
 }
 
-main();
+if (isMain(import.meta.url)) {
+  main();
+}

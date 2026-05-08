@@ -11,9 +11,8 @@ Node.js CLI tool (ESM modules) that checks if stored passwords are compromised u
 
 ## Core Commands
 - **Setup:** `npm run setup` (creates global config)
-- **Test all:** `npm test`
+- **Test (with coverage):** `npm test`
 - **Test single:** `npm test -- tests/lib/config.test.js`
-- **Coverage:** `npm run test:coverage`
 - **Format:** `npm run format:fix`
 - **Lint:** `npm run lint`
 - **Secrets:**

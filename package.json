@@ -1,6 +1,6 @@
 {
   "name": "check-my-secrets",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "NodeJS script checking whether any of the passwords used online are compromised.",
   "bin": {
     "check-my-secrets": "./bin/check-my-secrets.js",
@@ -24,8 +24,7 @@
     "secrets:check": "node bin/check-my-secrets.js",
     "secrets:delete": "node bin/delete-secret.js",
     "secrets:list": "node bin/list-secrets.js",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage"
+    "test": "vitest --coverage"
   },
   "keywords": [
     "security",

@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
+import { isMain } from '../lib/is-main.mjs';
 import { Entry } from '@napi-rs/keyring';
 import { SERVICE, README_STORE_SECRETS } from '../lib/constants.mjs';
 import { config } from '../lib/config.mjs';
 import { logger } from '../lib/logger.mjs';
 import { askQuestion } from '../lib/input.mjs';
 
-async function main() {
+export async function listSecrets() {
   const { passwordsKey, passwordsSeparator } = config();
 
   try {
@@ -40,4 +41,6 @@ async function main() {
   }
 }
 
-main();
+if (isMain(import.meta.url)) {
+  listSecrets();
+}

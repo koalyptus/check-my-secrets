@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { isMain } from '../lib/is-main.mjs';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { Entry } from '@napi-rs/keyring';
@@ -104,4 +105,6 @@ async function main() {
   await confirmAndDelete(result.passwordToDelete, result.inputMode);
 }
 
-main();
+if (isMain(import.meta.url)) {
+  main();
+}

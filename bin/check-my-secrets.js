@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { isMain } from '../lib/is-main.mjs';
 import { Entry } from '@napi-rs/keyring';
 import notifier from 'node-notifier';
 import { checkPasswords } from '../lib/check-passwords.mjs';
@@ -8,7 +9,7 @@ import { ERR_OSSL_BAD_DECRYPT, README_STORE_SECRETS, SERVICE } from '../lib/cons
 import { config } from '../lib/config.mjs';
 import { errorIconPath, successIconPath } from '../lib/assets.mjs';
 
-async function main() {
+export async function checkSecrets() {
   const { passwordsKey, passwordsSeparator } = config();
 
   let passwords;
@@ -74,4 +75,6 @@ async function main() {
   });
 }
 
-main();
+if (isMain(import.meta.url)) {
+  checkSecrets();
+}

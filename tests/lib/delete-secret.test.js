@@ -45,10 +45,12 @@ describe('delete-secret.js', () => {
     delete process.env.PWDS_SEPARATOR;
     delete process.env.PWDS_INPUT_MODE;
     vi.clearAllMocks();
+    vi.spyOn(console, 'log').mockImplementation(() => {});
   });
 
   afterEach(() => {
     process.env = originalEnv;
+    vi.restoreAllMocks();
   });
 
   it('should delete the entry when removing the last password (<=4 chars)', async () => {
