@@ -37,7 +37,7 @@ async function getPassword() {
   return { passwordToDelete, inputMode };
 }
 
-async function confirmAndDelete(passwordToDelete, inputMode) {
+export async function confirmAndDelete(passwordToDelete, inputMode) {
   const { passwordsKey, passwordsSeparator } = config();
 
   try {
@@ -81,8 +81,12 @@ async function confirmAndDelete(passwordToDelete, inputMode) {
     if (passwordList.length === initialLength) {
       logger.log({ level: 'warn', message: 'Password not found.' });
     } else {
-      passwords = passwordList.join(passwordsSeparator);
-      entry.setPassword(passwords);
+      if (passwordList.length === 0) {
+        entry.deletePassword();
+      } else {
+        passwords = passwordList.join(passwordsSeparator);
+        entry.setPassword(passwords);
+      }
       logger.log({ level: 'info', message: 'Password successfully deleted.' });
     }
   } catch (error) {
