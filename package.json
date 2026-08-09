@@ -11,8 +11,15 @@
     "secrets-setup": "./bin/setup.js"
   },
   "engines": {
-    "node": ">=17"
+    "node": ">=20"
   },
+  "files": [
+    "bin",
+    "lib",
+    "assets",
+    "README.md",
+    "LICENSE"
+  ],
   "type": "module",
   "scripts": {
     "start": "npm run secrets:check",
@@ -24,7 +31,8 @@
     "secrets:check": "node bin/check-my-secrets.js",
     "secrets:delete": "node bin/delete-secret.js",
     "secrets:list": "node bin/list-secrets.js",
-    "test": "vitest --coverage"
+    "test": "vitest run --coverage",
+    "test:watch": "vitest --coverage"
   },
   "keywords": [
     "security",
