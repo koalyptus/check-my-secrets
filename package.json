@@ -11,8 +11,15 @@
     "secrets-setup": "./bin/setup.js"
   },
   "engines": {
-    "node": ">=17"
+    "node": ">=20"
   },
+  "files": [
+    "bin",
+    "lib",
+    "assets",
+    "README.md",
+    "LICENSE"
+  ],
   "type": "module",
   "scripts": {
     "start": "npm run secrets:check",
@@ -24,7 +31,8 @@
     "secrets:check": "node bin/check-my-secrets.js",
     "secrets:delete": "node bin/delete-secret.js",
     "secrets:list": "node bin/list-secrets.js",
-    "test": "vitest --coverage"
+    "test": "vitest run --coverage",
+    "test:watch": "vitest --coverage"
   },
   "keywords": [
     "security",
@@ -51,8 +59,8 @@
   "devDependencies": {
     "eslint": "^8.31.0",
     "prettier": "^2.8.2",
-    "vite": "^5.0.0",
-    "vitest": "^1.0.0",
-    "@vitest/coverage-v8": "^1.0.0"
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.10"
   }
 }
